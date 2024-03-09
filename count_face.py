@@ -1,6 +1,6 @@
-import face_recognition
 from PIL import Image, ImageDraw, ExifTags
 import numpy as np
+import cv2
 import streamlit as st
 
 st.header("RCEE::AI&DS")
@@ -24,12 +24,16 @@ if uploaded_image is not None:
             image = image.rotate(90, expand=True)
     except (AttributeError, KeyError, IndexError):
         pass
+    
     image_np = np.array(image)
-    face_locations = face_recognition.face_locations(image_np)
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
     draw = ImageDraw.Draw(image)
-    for face_location in face_locations:
-        top, right, bottom, left = face_location
-        draw.rectangle(((left, top), (right, bottom)), outline="blue", width=3)
-    st.image(image, caption='Uploaded Image with Face Recognition', use_column_width=True)
-    num_faces = len(face_locations)
+    for (x, y, w, h) in faces:
+        draw.rectangle(((x, y), (x+w, y+h)), outline="blue", width=3)
+    
+    st.image(image, caption='Uploaded Image with Face Detection', use_column_width=True)
+    
+    num_faces = len(faces)
     st.write(f'Number of Faces Detected: {num_faces}')
