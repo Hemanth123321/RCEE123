@@ -1,5 +1,4 @@
-face_recognition
-opencv-python
+opencv-contrib-python
 numpy
 Pillow==10.2.0
 streamlit
